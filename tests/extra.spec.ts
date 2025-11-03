@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import {Base,student,course,week,resource} from "../Base.ts";
 
 test('test', async ({ page,context }) => {
     // change everything to id's because when someone is using a different language you can't use english to query it.
