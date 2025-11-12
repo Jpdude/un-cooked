@@ -1,0 +1,1 @@
+[[{"name":"_name","value":"null"}],[{"name":"sessionId","value":"null"}],[{"name":"sessionAuth","value":"null"}],[{"name":"course_names","value":[""]}],[{"name":"courses","value":[{"_name":"","name":""}]}]]

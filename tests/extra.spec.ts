@@ -43,19 +43,35 @@ test('test', async ({ page,context }) => {
     }
     async function login(sessionId:String,sessionAuthToken:String) {
 
-        context.addCookies([{name:"MDL_SSP_AuthToken", value:"_34df9090d2b3b16500594d73e37c9f454bd7c7d6de" , path:"/",domain:"moodle.tru.ca",httpOnly:true , secure:true},
-            {name:"MDL_SSP_SessID", value:"9dc085e1837158425133becbfe736e0f", path:"/",httpOnly:true , secure:true ,domain:"moodle.tru.ca"}])
-        await page.addInitScript(() => {
-             window.sessionStorage.setItem("1225293444/jsrev", "1759948476");
-            });
+        context.addCookies([{name:"MDL_SSP_AuthToken", value:"_d390e9f701fd340816726c730b1a07ef6dd7fba141" , path:"/",domain:"moodle.tru.ca",httpOnly:true , secure:true},
+            {name:"MDL_SSP_SessID", value:"f11aae8444123a97a063462fbeac9c21", path:"/",httpOnly:true , secure:true ,domain:"moodle.tru.ca"}])
         
+        const cookies = await context.cookies();
+        console.log(cookies);
+        for (let i = 0 ;  i < cookies.length ; i++){
+            if (cookies[i]["name"] == "MDL_SSP_SessID"){
+                console.log(cookies[i]["name"],cookies[i]["value"]);
+
+
+            }else if(cookies[i]["name"] == "MDL_SSP_AuthToken"){
+                console.log(cookies[i]["name"],cookies[i]["value"]);
+            }
+        }
         await page.goto('https://moodle.tru.ca/');
         await page.locator('text=Log in').first().click();
         console.log(page.url());
-        if (page.url() != "https://moodle.tru.ca/"){
-            //change everything to id's because when someone is using a different language you can't use english to query it.
-            return false; 
-        }
+        // if (page.url() != "https://moodle.tru.ca/"){
+        //     //change everything to id's because when someone is using a different language you can't use english to query it.
+        //     return false; 
+        // }
+        // const exp = new RegExp();
+
+        var name = await page.getByRole('heading', { name: /^Hi,\s([A-Za-z'-]+)!\s👋$/ }).innerText();
+        name = name.replace("👋","");
+        name = name.replace("Hi,","");
+        name = name.replace("!","");
+        name = name.trim();
+        console.log(name);
         await page.waitForSelector('text=My courses',{state:'visible'});
         // await page.getByRole('button', { name: 'My courses' }).click();
         await page.locator('text=My courses').first().click();
@@ -69,8 +85,7 @@ test('test', async ({ page,context }) => {
     }
 
     
-    if (!(await login("none","none")))
-        await signin("poop","poop");
+    await login("poop","poop");
 
     await getCourses();
 });
