@@ -4,14 +4,15 @@ import { type } from "os";
 var _page:any; // THis is meant to be var _page: Page; and so are the rest but ill fix that l8r
 var _context:any;
 var _browser:any;
-
+console.log("here")
 await check(); // Setting up the enviorments for all the classes
 async function check() {
     
 
     return await (async () => {
     const browser = await chromium.launch({
-        headless: true
+        headless: true,
+        
     });
     const context = await browser.newContext();
 
@@ -59,24 +60,27 @@ abstract class Base{
 class student extends Base{
     sessionId:string;
     sessionAuth: string;
+    moodleSess: string;
     course_names: string[];
-    courses: course[];
+    //courses: course[];
     
-
+    currSub = "temp";
 
     constructor(){
         super();
         this.sessionId = "null";
         this.sessionAuth = "null";
-        this.course_names = [""];
-        this.courses = [{
-            _name: "",
-            name: "",
-            save: function (): any[][] {
-                throw new Error("Function not implemented.");
-            },
-            id: ""
-        }];
+        this.moodleSess = "null";
+        this.course_names = [];
+        
+        // this.courses = [{
+        //     _name: "",
+        //     name: "",
+        //     save: function (): any[][] {
+        //         throw new Error("Function not implemented.");
+        //     },
+        //     id: ""
+        // }];
         
     
         
@@ -100,6 +104,7 @@ class student extends Base{
         console.log(this.id);
         
         try{
+
             if (!force){
                  throw  "Save"
              }
@@ -118,8 +123,11 @@ class student extends Base{
                     console.log(this.sessionId)
                 }else if(data[i][0]["name"] == "sessionAuth"){
                     this.sessionAuth = data[i][0]["value"];
+                }else if(data[i][0]["name"] == "moodleSess"){
+                    this.moodleSess = data[i][0]["value"];
+                    console.log(this.moodleSess);
                 }else if(data[i][0]["name"] == "courses"){
-                    this.courses = data[i][0]["value"];
+                    //this.courses = data[i][0]["value"];
 
                 }else if(data[i][0]["name"] == "course_names"){
                     this.course_names = data[i][0]["value"];
@@ -150,12 +158,15 @@ class student extends Base{
                     this.sessionId = cookies[i]["value"];
                 }else if(cookies[i]["name"] == "MDL_SSP_AuthToken"){
                     this.sessionAuth = cookies[i]["value"];
+                }else if(cookies[i]["name"] == "MoodleSession"){
+                    this.moodleSess = cookies[i]["value"];
+                    console.log(":"+this.moodleSess)
                 }
             }
             
         
            
-            console.log(await this.getCourses());
+            console.log(await this.getCourses());// this might be blocking session from saving
             await this.save();
             return true;
            
@@ -188,7 +199,7 @@ class student extends Base{
 
     }
 
-    async login(id:string , sessionId:string = "", sessionAuth:string = ""){
+    async login(id:string , sessionId:string = "", sessionAuth:string = "" , moodleSess:string = ""){
         id = id.replace("@mytru.ca","");
         this.id = id;
         console.log("Logging In");
@@ -196,16 +207,18 @@ class student extends Base{
             if(await this.refresh(true)){
                 sessionId = this.sessionId;
                 sessionAuth = this.sessionAuth;
+                moodleSess = this.moodleSess;
             }else{
                 return false;
             }
         }
         _context.addCookies([{name:"MDL_SSP_AuthToken", value: sessionAuth , path:"/",domain:"moodle.tru.ca",httpOnly:true , secure:true},
-            {name:"MDL_SSP_SessID", value: sessionId, path:"/",httpOnly:true , secure:true ,domain:"moodle.tru.ca"}])
+            {name:"MDL_SSP_SessID", value: sessionId, path:"/",httpOnly:true , secure:true ,domain:"moodle.tru.ca"},
+            {name:"MoodleSession", value: moodleSess, path:"/",httpOnly:false , secure:false ,domain:"moodle.tru.ca"}])//add Moodle Session
         
         console.log(sessionId,sessionAuth)
         await _page.goto('https://moodle.tru.ca/');
-        await _page.locator('text=Log in').first().click();
+        //await _page.locator('text=Log in').first().click();
         console.log(_page.url());
         if (_page.url() != "https://moodle.tru.ca/my/"){
             //change everything to id's because when someone is using a different language you can't use english to query it.
@@ -217,9 +230,158 @@ class student extends Base{
         
 
     }
+    async getResources(){
+        if(await _page.getByRole('Button',{name:"Open Course Index"}).isVisible()){// Use this logic for all the other operations in this class
+            await _page.getByRole('Button',{name:"Open Course Index"}).click();
+        }
+        
+        await _page.getByRole('Button',{name:"Course index options"}).click();
+        await _page.getByRole('Link',{name:"Expand all"}).click();
+        
+        
+        var old_url = _page.url();
+        this.currSub = this.currSub.replaceAll(" ","_");
+        console.log(this.currSub);
 
+        var save = `./${this.id.replace("@mytru.ca","")}/${this.currSub}/`;
+        var fold = "/general/";
+        var missing = false;
+        //const reg = /^(?:0?[1-9]|[12][0-9]|3[01])\s+[A-Za-z]+\s*-\s*(?:0?[1-9]|[12][0-9]|3[01])\s+[A-Za-z]+$/;//Need to find a slightly diff method incase a file is named like this
+
+        for (const row of await _page.getByRole("tree").getByRole("link").all()){
+            
+            var week;
+            var tName = await row.innerText();
+            console.log(tName);
+            try{
+                 await row.click();
+            }catch(TimeoutError){
+                missing = true;
+            }
+           
+            
+            if (tName == "Collapse" || tName == "Expand"){
+
+            }else{
+                var snap = await row.ariaSnapshot();
+                
+                if (snap.includes("/course/")){
+                    fold = "/"+tName+"/";
+                }
+                // if (reg.test(tName)){
+                    
+                //     console.log(snap.includes("/course/"));
+                //     fold = "/"+tName+"/";
+                // }
+                
+                if (_page.url() != old_url){
+                    console.log("yessir");
+                    await _page.goBack();
+                }else{
+                    const waitforD = _page.waitForEvent("download");
+                    await row.click();
+                    const down = await waitforD;
+                    await down.saveAs(save+fold+ down.suggestedFilename());
+                }
+                
+
+                    // week = await row.innerText();
+                    // week = week.replace("Expand","");
+                    // console.log(week);
+            }
+            
+            
+        }
+    }
+    async getWeeks(){
+        var count2 = 0;
+        var data;
+        //First Method( Long complex and tidious)
+        /*
+        for ( const v of await _page.getByRole('list').filter({ hasText: 'General' }).getByRole("listitem").getByRole("heading").all()){
+
+            console.log("-------------------");
+            data = await v.innerText();
+            console.log(": "+  await v.innerText());
+             var block = [];
+            for ( const l of await _page.getByRole('list').filter({ hasText: 'General' }).getByRole("listitem").filter({hasText: await v.innerText()}).getByRole("list").all()){
+                //console.log("********************");
+                //console.log(await l.innerText());
+                //console.log("poop:"+await l.locator("li > ul > li").all())
+               
+                for ( const p of await l.getByRole("listitem").filter({}).all()){
+                var ru = await p.getByRole("list").getByRole("listitem").all();
+                   
+                    if ( ru.length > 0){
+                        console.log("len...."+ru.length);
+                        block = [];
+                        for (var i = 0; i < ru.length ; i++){
+                            block.push( await ru[i].innerText());
+                        }
+
+                    }
+                    var inner = await p.innerText()
+                    if ( !(block.includes(inner))){
+                        console.log("********************");
+                        //console.log(p+"      Block:\n"+block);
+                        console.log(inner);
+                        console.log("********************");
+                    }
+                    
+
+                    
+                    
+                }
+                //console.log("********************");
+            }
+            
+
+            
+            // for ( const l of await _page.getByRole('list').filter({ hasText: 'General' }).getByRole("listitem").getByRole("list").first()){
+            //     console.log("********************");
+            //     console.log(await l.innerText());
+            //     console.log("********************");
+            //     // for ( const p of await l.getByRole("listitem").all()){
+            //     //     console.log("********************");
+            //     //     console.log(await p.innerText());
+            //     //     console.log("********************");
+            //     // }
+            // }
+            // if (data.trim() != ""){
+            //     dataList = data.split("\n");
+            //     console.log( "INNER  "+dataList );
+            //     dataList = dataList.filter( (item:string) =>{
+            //         return item != "Expand" && item != "Expand all" && item != "General";                   
+            //     })
+            //     console.log( "OUETER  "+dataList );
+            // }
+            //console.log("DATA  "+data);
+            
+        }
+        // for ( const l of h ){
+        */
+
+
+        //Second Method
+        if(await _page.getByRole('Button',{name:"Open Course Index"}).isVisible()){// Use this logic for all the other operations in this class
+            await _page.getByRole('Button',{name:"Open Course Index"}).click();
+        }
+        
+        await _page.getByRole('Button',{name:"Course index options"}).click();
+        await _page.getByRole('Link',{name:"Collapse all"}).click();
+        var week;
+        for (const row of await _page.getByRole("treeitem").all()){
+            week = await row.innerText();
+            week = week.replace("Expand","");
+            console.log(week);
+        }
+
+    }
     async getCourses(){// refacroring needed here make this a core fucntion , make duplicate function for purely retrival purposes
         await _page.locator('text=My courses').first().click();
+        var data;
+        var dataList;
+        var tempCourseList = [];
         var start = new Date().getTime();
         for (var i = 0; i < 1e7; i++) {
             if ((new Date().getTime() - start) > 1000){
@@ -234,17 +396,81 @@ class student extends Base{
         var count = await _page.getByRole('listitem').count();
         console.log(count)
         count = 0;
+        var currUrl = _page.url();
         for (const row of await _page.getByRole('listitem').all()){
+           
+            
             console.log("-------------------------------",count,"--------------------------------------------------");
-            var data = await row.innerText();
-            var dataList = data.split("\n");
-    
+            
+            
+            data = await row.innerText();
+            //console.log(data);
+            dataList = data.split("\n");
             console.log(dataList[0]);
-            this.course_names.push(dataList[0])
+            this.currSub =  dataList[0];
+            
+            await row.click();
+            for (var i = 0; i < 1e7; i++) {
+                if ((new Date().getTime() - start) > 5000){
+                break;
+                }
+            }
+            await this.getResources();
+            if( currUrl != _page.url()){
+                await _page.goto(currUrl,{waitUntil:"networkidle"});// the docs say networkidle is discourged(for testing atleast), but it works fine for me
+                console.log("yeahsirr")
+                
+            }
+            
+             // dataList has some possible useful info print to find out
+            tempCourseList.push(dataList[0])
+            
             console.log("-------------------------------",count,"--------------------------------------------------");
             count++;
+            
         };
 
+        // add to course loop above later
+        // var h = await _page.getByRole('listitem').all();
+        // await h[0].click();
+        // for (var i = 0; i < 1e7; i++) {
+        //     if ((new Date().getTime() - start) > 5000){
+        //     break;
+        //     }
+        // }
+        
+        //await _page.getByRole('button', { name: 'Collapse all' }).click();
+        // console.log("DOne")
+        // console.log(await _page.getByRole('list').filter({ hasText: 'General' }).all());
+        //console.log(await _page.getByRole('listitem').all());
+        
+        // for ( const v of await _page.getByRole('list').all()){
+            
+        //     console.log("---------"+count2+"----------");
+        //     data = await v.innerText();
+        //     // if (data.trim() != ""){
+        //     //     dataList = data.split("\n");
+        //     //     console.log( "INNER  "+dataList );
+        //     //     dataList = dataList.filter( (item:string) =>{
+        //     //         return item != "Expand" && item != "Expand all" && item != "General";                   
+        //     //     })
+        //     //     console.log( "OUETER  "+dataList );
+        //     // }
+        //     console.log("DATA  "+data);
+        //     count2++;
+        //     console.log("---------"+count2+"----------");
+            
+        // }
+        // for ( const l of h ){
+
+        // }
+
+        // This block of code is the valley of the shadow of death T_T
+        
+
+        // }
+        //await _page.goBack();
+        //this.course_names = tempCourseList;
         return this.course_names
 
     }
@@ -257,11 +483,22 @@ class student extends Base{
 }
 class course extends Base{
 
-    constructor(name:string ){
+    weeks: week[];
+
+    constructor(name:string){
         super();
-        
+        this.weeks = [{
+            _name: "",
+            name: "",
+            save: function (): any[][] {
+                throw new Error("Function not implemented.");
+            },
+            id: ""
+        }];
         
     }
+
+    
 
 }
 class week extends Base{
@@ -285,11 +522,18 @@ class resource extends Base{
 
 var stan = new student();
 
-if ((await stan.signin("t00749160@mytru.ca","#D1"))){
+if ((await stan.login("t00725466@mytru.ca"))){
     console.log("Signed In");
+    console.log( await stan.getCourses());
+    
 }else{
     console.log("Unsucessful")
 }
-
+// if ((await stan.signin("t00725466@mytru.ca","Elowinnersoso4834$"))){
+//     console.log("Signed In");
+// }else{
+//     console.log("Unsucessful")
+// }
+//Doesnt save moodleSess for some reason
 //stan.release();
 export {Base,student,course,week,resource};
