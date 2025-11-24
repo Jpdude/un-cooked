@@ -529,7 +529,7 @@ if ((await stan.login("t00725466@mytru.ca"))){
 }else{
     console.log("Unsucessful")
 }
-// if ((await stan.signin("t00725466@mytru.ca","Elowinnersoso4834$"))){
+// if ((await stan.signin("t00725466@mytru.ca","pwrd$"))){
 //     console.log("Signed In");
 // }else{
 //     console.log("Unsucessful")
