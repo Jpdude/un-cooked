@@ -1,4 +1,5 @@
 import {chromium} from "playwright";
+import readline from 'node:readline';
 import * as fs from 'fs';
 import { type } from "os";
 var _page:any; // THis is meant to be var _page: Page; and so are the rest but ill fix that l8r
@@ -28,13 +29,15 @@ async function check() {
 abstract class Base{
     _name:string;
     id:string;
+    //student:student;
 
 
 
     constructor( ){
         this._name = "null";
         this.id = "null";
-        
+        //this.student = new student;
+    
     }
 
     get name():string{
@@ -165,9 +168,9 @@ class student extends Base{
             }
             
         
-           
+            this.save();
             console.log(await this.getCourses());// this might be blocking session from saving
-            await this.save();
+            this.save();
             return true;
            
 
@@ -247,23 +250,44 @@ class student extends Base{
         var fold = "/general/";
         var missing = false;
         //const reg = /^(?:0?[1-9]|[12][0-9]|3[01])\s+[A-Za-z]+\s*-\s*(?:0?[1-9]|[12][0-9]|3[01])\s+[A-Za-z]+$/;//Need to find a slightly diff method incase a file is named like this
+        try{
 
-        for (const row of await _page.getByRole("tree").getByRole("link").all()){
+            
+            for (const row of await _page.getByRole("tree").getByRole("link").all()){
             
             var week;
-            var tName = await row.innerText();
-            console.log(tName);
+            
+            
             try{
-                 await row.click();
+                var tName = await row.innerText();
+                await row.click();
+                console.log(_page.url());
             }catch(TimeoutError){
+                await row.click({ force: true });
+                console.log(_page.url());
+                console.log("failed");
+                //var tName = await row.innerText();
+                //var tNmae = "failed";
+                await _page.reload({waitUntil:"load"});
                 missing = true;
             }
+            console.log(tName);
            
             
             if (tName == "Collapse" || tName == "Expand"){
 
             }else{
-                var snap = await row.ariaSnapshot();
+
+                try{
+                    var snap = await row.ariaSnapshot();
+                }catch(e){
+                    console.log("failed");
+                    await _page.reload({waitUntil:"load"});
+                    await _page.isVisible(`text='${tName}`)
+
+                    var snap = await row.ariaSnapshot({ force: true });
+                    missing = true;
+                }
                 
                 if (snap.includes("/course/")){
                     fold = "/"+tName+"/";
@@ -277,6 +301,7 @@ class student extends Base{
                 if (_page.url() != old_url){
                     console.log("yessir");
                     await _page.goBack();
+                    console.log("old:"+_page.url());
                 }else{
                     const waitforD = _page.waitForEvent("download");
                     await row.click();
@@ -292,6 +317,11 @@ class student extends Base{
             
             
         }
+
+        }catch(e){
+            console.warn(e);
+        }
+        
     }
     async getWeeks(){
         var count2 = 0;
@@ -378,6 +408,11 @@ class student extends Base{
 
     }
     async getCourses(){// refacroring needed here make this a core fucntion , make duplicate function for purely retrival purposes
+        await _context.tracing.start({ 
+                snapshots: true, 
+                screenshots: true, 
+                sources: true 
+            });
         await _page.locator('text=My courses').first().click();
         var data;
         var dataList;
@@ -471,6 +506,7 @@ class student extends Base{
         // }
         //await _page.goBack();
         //this.course_names = tempCourseList;
+        await _context.tracing.stop({ path: 'trace.zip' });
         return this.course_names
 
     }
@@ -522,18 +558,47 @@ class resource extends Base{
 
 var stan = new student();
 
-if ((await stan.login("t00725466@mytru.ca"))){
+// const rl = readline.createInterface({
+//     input: process.stdin,
+//     output: process.stdout
+// });
+
+// rl.question("Username: ", async function(username:string) {
+//     rl.question("Password: ", async function(password:string) {
+//         rl.close();
+//         console.log(username);
+//         if ((await stan.signin(username,password))){
+//             console.log("Signed In");
+//         }else{
+//             console.log("Unsucessful")
+//         }
+        
+       
+//     });
+// });  
+if ((await stan.login("t00749160@mytru.ca"))){ //I already logged in so my session is still active
     console.log("Signed In");
     console.log( await stan.getCourses());
     
 }else{
     console.log("Unsucessful")
 }
-// if ((await stan.signin("t00725466@mytru.ca","pwrd$"))){
+// if ((await stan.signin("t00749160@mytru.ca","pwrd"))){
 //     console.log("Signed In");
 // }else{
 //     console.log("Unsucessful")
 // }
+
+
 //Doesnt save moodleSess for some reason
 //stan.release();
 export {Base,student,course,week,resource};
+//This downloads everything from model... This is my second time writting this cod
+/*
+This takes a while as I am rushing and have not refactored the code
+I will optimize it later but have to help in the frontend as the project subissiom date nears
+because the public will not understand a terminal.
+
+
+
+*/
