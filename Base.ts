@@ -98,7 +98,7 @@ class student extends Base{
                 name = name.replace("!","");
                 name = name.trim();
                 this._name = name
-            }catch(e){
+            }catch(e:any){
                 console.error("Caught error:", e.message);
                 throw e;
                 return false;
@@ -593,12 +593,3 @@ if ((await stan.login("t00749160@mytru.ca"))){ //I already logged in so my sessi
 //Doesnt save moodleSess for some reason
 //stan.release();
 export {Base,student,course,week,resource};
-//This downloads everything from model... This is my second time writting this cod
-/*
-This takes a while as I am rushing and have not refactored the code
-I will optimize it later but have to help in the frontend as the project subissiom date nears
-because the public will not understand a terminal.
-
-
-
-*/
