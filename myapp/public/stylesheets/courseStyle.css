@@ -1,0 +1,146 @@
+@import url('https://fonts.googleapis.com/css2?family=Magra:wght@400;700&display=swap');
+
+:root{
+    --body-color:rgb(255, 255, 255);
+    --text-color:black;
+    --opp-color:black;
+    --accent-color:black;
+    --sec-color:white;
+}
+
+body {
+  overflow-x: hidden;
+  font: 14px "Magra", sans-serif;
+  font-family: Magra;
+  background-color:var(--body-color);
+  margin: 0%;
+  color:var(--text-color);
+}
+
+#body{
+  grid-area: body;
+  
+  
+}
+
+#tools{
+  grid-area: tools;
+  align-items: end;
+  display: grid;
+  grid-template-columns: 0.1fr 0.8fr;
+  grid-template-areas: 'week . add';
+  
+
+}
+
+header{
+  grid-area: header;
+  /* border-bottom: 1px solid black; */
+  align-items: center;
+  display: grid;
+  position: sticky;
+  top: 0; 
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  z-index: 1;
+ 
+  grid-template-columns: 0.1fr 1fr 0.8fr;
+  grid-template-areas: 'img title  options';
+  box-shadow: 0px 0.5px 1px 0px rgb(214, 214, 214);
+  border-bottom: 1px solid  rgb(214, 214, 214);
+
+}
+
+div#main{
+    display: grid;
+    /* grid-template-columns: ; */
+    grid-template-rows: 0.1fr 0.1fr 0.2fr 3fr;
+    grid-template-areas: 'header'
+                         'fact'
+                         'tools'   
+                         'body'
+                         ;
+    height: 100vh;
+    
+    margin: 0%;
+}
+
+
+
+div#week{
+    grid-area: week;
+}
+div#add{
+    grid-area: add;
+    
+}
+
+.new-fact {
+  animation: collapse 2s ease-in-out forwards;
+}
+.fact {
+  animation: appear 2s ease-out forwards;
+}
+
+@keyframes collapse {
+  from { height: 100%; }
+  50% { height: 0%; }
+  to { height: 100%; }
+}
+@keyframes appear {
+  from { opacity: 50%; }
+  5% { opacity: 0%; }
+  95% { opacity: 3%; }
+  to { opacity: 100%; }
+}
+
+.fact{
+    
+}
+
+div#facts{
+    width: 100%;
+    background-color: beige;
+}
+
+.welcomeTxt{
+    font-size: 3.5rem;
+    margin: 2%;
+}
+
+
+.courseTxt{
+    font-size: 4rem;
+    margin-left: 25%;
+}
+
+
+.course{
+    width: 20%;
+    height: 20%;
+    margin-left: 5%;
+    background-color: #fe6201fa;
+    border: 2px solid #fe62012a;
+    
+    border-bottom-right-radius: 5%;
+}
+
+.course:hover{
+   background-color: #fe62012a;
+   border: 2px solid #fe6201fa;
+   box-shadow: 0px 4px 16px 0px #afafaf;
+
+}
+
+img#logo{
+  grid-area: img;
+  place-self: right;
+  margin-left: 50%;
+
+}
+img#logo:hover{
+  grid-area: img;
+  place-self: right;
+  margin-left: 45%;
+  cursor: pointer;
+}

@@ -1,0 +1,1 @@
+[[{"name":"_name","value":"Hisgrace"}],[{"name":"id","value":"t00780256"}],[{"name":"sessionId","value":"f33de872736894f319375175941cba0f"}],[{"name":"sessionAuth","value":"_618f4308ebaf9dbc09863b8b50eda6aaef78f51a41"}],[{"name":"moodleSess","value":"369kgf70f9qm38te76hu0jr0rp"}],[{"name":"course_names","value":[]}],[{"name":"currSub","value":"temp"}]]

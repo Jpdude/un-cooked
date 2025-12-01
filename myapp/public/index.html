@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="stylesheets/style.css">
+</head>
+<body>
+    <div id= "main">
+        
+        <header >
+            <img id = "logo" src="./images/OnWhite.svg" width="50px" height="50px">
+            <h2 style=" grid-area: title; place-self: left; align-self: end; margin: 0%; font-size: 2rem; "> Uncooked</h2>
+
+        </header>
+        <div class="options">
+
+            <img id = "mode" src="./images/day-mode (1).png" width="40px" height="40px" style="margin-left: 80%; margin-top: 2%; border-radius: 20%;"  ondblclick="toggle()">
+        </div>
+       
+        <form id = "subMain" > 
+            <div style="display: block;">
+                <div id = "school">
+                    <p style="color: white; font-weight: bolder;">TRU</p>
+                    </div>
+                <div id = "login">
+                    
+                    <h1 id = "login" >Login</h1>
+                </div>
+            </div>
+           
+            <div class = "auth">
+                <label name = "id" for ="id" style="display: table-row;">ID</label>
+                <input name = "id" class="auth" type="email" style="display: table-row;" placeholder="t00XXXXXX@mytru.ca" required></input>
+
+            </div>
+            <div class = "auth">
+                <label name = "password" for ="Password" style="display: table-row;">Password</label>
+                <input name = "password" class = "auth" type ="password" style="display: table-row;" placeholder="iLoveKittens123" required></input>
+
+            </div>
+            <button id = "login" onclick="soks(this)">Log In</button>
+            <p style="margin: auto; text-align: center;">Don't Have an account?</p>
+           
+            
+        </form>
+        <h5 class = "privacy">By clicking continue, you agree to our <span class="terms">Terms of Service</span> and <span class="terms">Privacy Policy</span></h5 class = "Privacy">
+        <div class="note"><h4 class="copy" > &copy 2025 Uncooked</h4></div>
+    </div>
+</body>
+<script src="./javascripts/index.js"></script>
+</html>
