@@ -14,7 +14,7 @@ async function setUp() {
 
     return await (async () => {
     const browser = await chromium.launch({
-        headless: true,
+        headless: false,
     });
     const context = await browser.newContext();
 
@@ -164,6 +164,7 @@ class Student extends Base{
         }
     }
     async signin(username:string, password:string){
+        console.log("HAlo")
         this.id = username.replace("@mytru.ca","");
         if( !(await this.login(username))){
 
@@ -476,31 +477,31 @@ class Resource extends Base{
 
 var stan = new Student();
 
-// const rl = readline.createInterface({
-//     input: process.stdin,
-//     output: process.stdout
-// });
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
 
-// rl.question("Username: ", async function(username:string) {
-//     rl.question("Password: ", async function(password:string) {
-//         rl.close();
-//         console.log(username);
-//         if ((await stan.signin(username,password))){
-//             console.log("Signed In");
-//         }else{
-//             console.log("Unsucessful")
-//         }
+rl.question("Username: ", async function(username:string) {
+    rl.question("Password: ", async function(password:string) {
+        rl.close();
+        console.log(username);
+        if ((await stan.signin(username,password))){
+            console.log("Signed In");
+        }else{
+            console.log("Unsucessful")
+        }
         
        
-//     });
-// });  
-if ((await stan.login("t00725466@mytru.ca"))){ //I already logged in so my session is still active
-    console.log("Signed In");
-    console.log( await stan.initialData(true));
+    });
+});  
+// if ((await stan.login("t00725466@mytru.ca"))){ //I already logged in so my session is still active
+//     console.log("Signed In");
+//     console.log( await stan.initialData(true));
     
-}else{
-    console.log("Unsucessful")
-}
+// }else{
+//     console.log("Unsucessful")
+// }
 // if ((await stan.signin("t00725466@mytru.ca","Elowinnersoso4834$"))){
 //     console.log("Signed In");
 // }else{

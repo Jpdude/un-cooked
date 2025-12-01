@@ -160,7 +160,7 @@ async function soks(e){
         const data = await res.json();
         console.log(data);
         localStorage.setItem("session", data.session);
-        window.location.href = "http://127.0.0.1:5500/myapp/public/coursePage.html";
+        window.location.href = "http://127.0.0.1:5500/site/coursePage.html";
         
     } catch (error) {
         console.error('Error:', error);

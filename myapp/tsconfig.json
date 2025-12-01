@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "es2017",
+    "module": "commonjs",
+    "rootDir": "c:/Users/Jp/OneDrive/Documentos/School_Stuff/2ND_yr_FALL/Project_Y/",
+    "outDir": "./build",
+    "esModuleInterop": true,
+    "strict": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true
+  }
+}
