@@ -110,15 +110,18 @@ div#facts{
 
 
 .courseTxt{
-    font-size: 4rem;
-    margin-left: 25%;
+    font-size: 3rem;
+    margin: 0%;
+    margin-top: 10%;
+    
 }
 
 
 .course{
-    width: 20%;
-    height: 20%;
-    margin-left: 5%;
+    
+    width: 20vw;
+    height: 20vh;
+    margin-left: 5vw;
     background-color: #fe6201fa;
     border: 2px solid #fe62012a;
     
@@ -135,12 +138,12 @@ div#facts{
 img#logo{
   grid-area: img;
   place-self: right;
-  margin-left: 50%;
+  margin-left: 5vw;
 
 }
 img#logo:hover{
   grid-area: img;
   place-self: right;
-  margin-left: 45%;
+  margin-left: 50%;
   cursor: pointer;
 }

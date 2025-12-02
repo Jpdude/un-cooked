@@ -60,13 +60,13 @@ header{
 img#logo{
   grid-area: img;
   place-self: right;
-  margin-left: 40%;
+  margin-left: 5vw;
 
 }
 img#logo:hover{
   grid-area: img;
   place-self: right;
-  margin-left: 40%;
+  margin-left: 5vw;
   cursor: pointer;
 }
 #subMain{
